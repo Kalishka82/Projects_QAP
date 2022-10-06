@@ -5,12 +5,26 @@ from extensions import APIException, CurrencyConverter
 bot = telebot.TeleBot(TOKEN)
 
 
-@bot.message_handler(commands=['start', 'help'])
+@bot.message_handler(commands=['start'])
+def start(message: telebot.types.Message):
+    bot.send_message(message.chat.id, f'Привет, {message.chat.username}!\
+    \nНужна помощь в конвертации валют? Я помогу \
+    \n \
+    \nВведите через пробел: \
+    \nимя валюты для перевода (имя из 2х слов вводить слитно) \
+    \nимя валюты, в которую хотите перевести \
+    \nколичество переводимой валюты \
+    \n \
+    \nПосмотреть список всех доступных валют: /values \
+    \nНужна помощь? нажмите /help') 
+
+
+@bot.message_handler(commands=['help'])
 def help(message: telebot.types.Message):
-    text = 'Отправьте сообщение боту в виде: \n<имя валюты для перевода> \
-<имя валюты, в которую хотите перевести> \
-<количество переводимой валюты> \
-\nИмя валюты из 2х слов вводить без пробела\
+    text = 'введите через пробел: \nимя валюты для перевода (имя из 2х слов вводить слитно) \
+\nимя валюты, в которую хотите перевести \
+\nколичество переводимой валюты \
+\n \
 \nПосмотреть список всех доступных валют: /values'
     bot.reply_to(message, text)
 
@@ -26,7 +40,7 @@ def values(message: telebot.types.Message):
 @bot.message_handler(content_types=['text', ])
 def convert(message: telebot.types.Message):
     try:
-        values = message.text.lower().split(' ')
+        values = message.text.lower().replace(',', '.').split(' ')
 
         if len(values) != 3:
             raise APIException('Не совпадает количество введенных параметров\
